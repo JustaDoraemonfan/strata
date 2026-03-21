@@ -12,7 +12,8 @@ import { computeStratumScore } from "../services/scoring.service.js";
  */
 const triggerSessionBuild = async (req, res) => {
   try {
-    const { sessionId, userId, projectId } = req.body;
+    const { sessionId, projectId } = req.body;
+    const userId = req.user.userId;
 
     if (!sessionId || !userId || !projectId) {
       return res.status(400).json({
@@ -51,7 +52,8 @@ const triggerSessionBuild = async (req, res) => {
  */
 const getSessions = async (req, res) => {
   try {
-    const { userId, from, to } = req.query;
+    const { from, to } = req.query;
+    const userId = req.user.userId;
 
     if (!userId || !from || !to) {
       return res.status(400).json({

@@ -10,9 +10,8 @@ import {
  */
 const ingestEvent = async (req, res) => {
   try {
-    const { userId, type, timestamp, sessionId, projectId, metadata } =
-      req.body;
-
+    const { type, timestamp, sessionId, projectId, metadata } = req.body;
+    const userId = req.user.userId;
     // Basic presence check — detailed validation happens in validateRequest middleware
     if (!userId || !type || !sessionId || !projectId) {
       return res.status(400).json({
@@ -61,8 +60,8 @@ const ingestEvent = async (req, res) => {
  */
 const getEvents = async (req, res) => {
   try {
-    const { userId, from, to } = req.query;
-
+    const { from, to } = req.query;
+    const userId = req.user.userId;
     if (!userId || !from || !to) {
       return res.status(400).json({
         success: false,

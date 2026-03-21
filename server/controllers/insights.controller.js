@@ -18,8 +18,8 @@ import {
  */
 const triggerInsightBuild = async (req, res) => {
   try {
-    const { userId, date } = req.body;
-
+    const { date } = req.body;
+    const userId = req.user.userId;
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -61,8 +61,8 @@ const triggerInsightBuild = async (req, res) => {
  */
 const getInsights = async (req, res) => {
   try {
-    const { userId, limit } = req.query;
-
+    const { limit } = req.query;
+    const userId = req.user.userId;
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -96,8 +96,8 @@ const getInsights = async (req, res) => {
  */
 const getWeekInsight = async (req, res) => {
   try {
-    const { userId, date } = req.query;
-
+    const { date } = req.query;
+    const userId = req.user.userId;
     if (!userId || !date) {
       return res.status(400).json({
         success: false,
