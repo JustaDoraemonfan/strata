@@ -27,7 +27,7 @@ app.get("/health", (req, res) => {
 });
 
 // --- API Routers ---
-app.use("/api/auth", authenticate, authRouter); // Public + protected auth routes
+app.use("/api/auth", authRouter); // Public + protected auth routes
 app.use("/api/events", authenticate, eventsRouter); // Protected in next step
 app.use("/api/sessions", authenticate, sessionsRouter); // Protected in next step
 app.use("/api/insights", authenticate, insightsRouter); // Protected in next step

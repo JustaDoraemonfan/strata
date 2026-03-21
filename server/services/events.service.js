@@ -1,48 +1,42 @@
+// server/services/events.service.js
 import Event from "../models/Event.model.js";
-
-/**
- * Creates and persists a single developer event.
- * @param {Object} eventData - Validated event payload from the controller
- * @param {string} eventData.userId
- * @param {string} eventData.type - One of: keystroke | save | commit | error | debug
- * @param {Date}   eventData.timestamp
- * @param {string} eventData.sessionId
- * @param {string} eventData.projectId
- * @param {Object} eventData.metadata - Optional, shape varies per event type
- * @returns {Promise<Object>} The saved event document
- */
+import { getCache, setCache, invalidateCache, TTL } from "../utils/cache.js";
 
 const createEvent = async (eventData) => {
   const event = new Event(eventData);
   const saved = await event.save();
+
+  // Invalidate events cache for this user — new event means cached ranges are stale
+  await invalidateCache(`events:${eventData.userId}:*`);
+
   return saved;
 };
 
-/**
- * Retrieves all events for a user within a time range.
- * Used by the session service to build sessions from raw events.
- * @param {string} userId
- * @param {Date} from - Start of time range
- * @param {Date} to - End of time range
- * @returns {Promise<Array>} Array of event documents, sorted oldest → newest
- */
-
 const getEventsByUserAndRange = async (userId, from, to) => {
+  const cacheKey = `events:${userId}:${from.toISOString()}:${to.toISOString()}`;
+
+  // Check cache first
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log(`[cache] ✅ HIT — ${cacheKey}`);
+    return cached;
+  }
+
+  // Cache miss — query Atlas
   const events = await Event.find({
     userId,
     timestamp: { $gte: from, $lte: to },
-  }).sort({ timestamp: 1 }); // Oldest first — important for session building logic
+  }).sort({ timestamp: 1 });
+
+  // Cache the result
+  await setCache(cacheKey, events, TTL.EVENTS);
+  console.log(`[cache] 💾 SET — ${cacheKey}`);
 
   return events;
 };
 
-/**
- * Retrieves all events belonging to a specific session.
- * Used by the scoring service when computing the Stratum Score.
- * @param {string} sessionId
- * @returns {Promise<Array>} Array of event documents, sorted oldest → newest
- */
 const getEventsBySession = async (sessionId) => {
+  // Not cached — called once per session build, not repeatedly
   const events = await Event.find({ sessionId }).sort({ timestamp: 1 });
   return events;
 };

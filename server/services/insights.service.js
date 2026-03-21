@@ -1,5 +1,6 @@
 import Insight from "../models/Insight.model.js";
 import Session from "../models/Session.model.js";
+import { getCache, setCache, invalidateCache, TTL } from "../utils/cache.js";
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -326,6 +327,9 @@ const buildWeeklyInsight = async (userId, date) => {
     { upsert: true, new: true },
   );
 
+  // Invalidate insights cache for this user
+  await invalidateCache(`insights:${userId}:*`);
+
   return insight;
 };
 
@@ -336,9 +340,20 @@ const buildWeeklyInsight = async (userId, date) => {
  * @returns {Promise<Array>}
  */
 const getInsightsByUser = async (userId, limit = 8) => {
+  const cacheKey = `insights:${userId}:all:${limit}`;
+
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log(`[cache] ✅ HIT — ${cacheKey}`);
+    return cached;
+  }
+
   const insights = await Insight.find({ userId })
     .sort({ weekOf: -1 })
     .limit(limit);
+
+  await setCache(cacheKey, insights, TTL.INSIGHTS);
+  console.log(`[cache] 💾 SET — ${cacheKey}`);
 
   return insights;
 };
@@ -351,7 +366,21 @@ const getInsightsByUser = async (userId, limit = 8) => {
  */
 const getInsightForWeek = async (userId, date) => {
   const weekOf = getMondayOfWeek(date);
+  const cacheKey = `insights:${userId}:week:${weekOf.toISOString()}`;
+
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log(`[cache] ✅ HIT — ${cacheKey}`);
+    return cached;
+  }
+
   const insight = await Insight.findOne({ userId, weekOf });
+
+  if (insight) {
+    await setCache(cacheKey, insight, TTL.INSIGHTS);
+    console.log(`[cache] 💾 SET — ${cacheKey}`);
+  }
+
   return insight;
 };
 

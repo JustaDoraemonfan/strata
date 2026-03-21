@@ -1,24 +1,14 @@
 import Session from "../models/Session.model.js";
 import { getEventsBySession } from "./events.service.js";
+import { getCache, setCache, invalidateCache, TTL } from "../utils/cache.js";
 
-// If gap between two consecutive events exceeds this → interruption detected
-const INTERRUPTION_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
+const INTERRUPTION_THRESHOLD_MS = 5 * 60 * 1000;
 
-/**
- * Detects focus blocks and interruptions from a sorted array of events.
- * A focus block = uninterrupted coding for any duration.
- * An interruption = gap > 5 minutes between consecutive events.
- *
- * @param {Array} events - Sorted oldest → newest
- * @returns {{ focusBlocks: Array, interruptionCount: Number }}
- */
 const analyzeFocusPatterns = (events) => {
   const focusBlocks = [];
   let interruptionCount = 0;
 
-  if (events.length < 2) {
-    return { focusBlocks, interruptionCount };
-  }
+  if (events.length < 2) return { focusBlocks, interruptionCount };
 
   let blockStart = new Date(events[0].timestamp);
   let blockEnd = new Date(events[0].timestamp);
@@ -29,25 +19,16 @@ const analyzeFocusPatterns = (events) => {
     const gap = current - previous;
 
     if (gap > INTERRUPTION_THRESHOLD_MS) {
-      // Gap detected — close the current focus block
       const durationMinutes = Math.round((blockEnd - blockStart) / 60000);
-
       if (durationMinutes > 0) {
-        focusBlocks.push({
-          start: blockStart,
-          end: blockEnd,
-          durationMinutes,
-        });
+        focusBlocks.push({ start: blockStart, end: blockEnd, durationMinutes });
       }
-
       interruptionCount++;
-      blockStart = current; // Start a new focus block
+      blockStart = current;
     }
-
-    blockEnd = current; // Keep extending the current block
+    blockEnd = current;
   }
 
-  // Close the final block
   const finalDuration = Math.round((blockEnd - blockStart) / 60000);
   if (finalDuration > 0) {
     focusBlocks.push({
@@ -60,40 +41,15 @@ const analyzeFocusPatterns = (events) => {
   return { focusBlocks, interruptionCount };
 };
 
-/**
- * Counts how many of each event type exist in the session.
- * @param {Array} events
- * @returns {Object} breakdown - { keystroke, save, commit, error, debug }
- */
 const buildEventBreakdown = (events) => {
-  const breakdown = {
-    keystroke: 0,
-    save: 0,
-    commit: 0,
-    error: 0,
-    debug: 0,
-  };
-
+  const breakdown = { keystroke: 0, save: 0, commit: 0, error: 0, debug: 0 };
   events.forEach((event) => {
-    if (breakdown.hasOwnProperty(event.type)) {
-      breakdown[event.type]++;
-    }
+    if (breakdown.hasOwnProperty(event.type)) breakdown[event.type]++;
   });
-
   return breakdown;
 };
 
-/**
- * Builds and persists a session document from raw events.
- * If a session document already exists for this sessionId, it gets updated.
- *
- * @param {string} sessionId
- * @param {string} userId
- * @param {string} projectId
- * @returns {Promise<Object>} The saved or updated session document
- */
 const buildSession = async (sessionId, userId, projectId) => {
-  // Fetch all events for this session — sorted oldest → newest by events.service.js
   const events = await getEventsBySession(sessionId);
 
   if (events.length === 0) {
@@ -107,8 +63,6 @@ const buildSession = async (sessionId, userId, projectId) => {
   const { focusBlocks, interruptionCount } = analyzeFocusPatterns(events);
   const eventBreakdown = buildEventBreakdown(events);
 
-  // upsert: true → creates if doesn't exist, updates if it does
-  // This means buildSession is safely re-runnable without creating duplicates
   const session = await Session.findOneAndUpdate(
     { sessionId },
     {
@@ -122,37 +76,37 @@ const buildSession = async (sessionId, userId, projectId) => {
       interruptionCount,
       eventBreakdown,
       totalEvents: events.length,
-      scored: false, // Reset scored flag — needs re-scoring after rebuild
+      scored: false,
     },
-    { upsert: true, new: true }, // new: true → returns updated document
+    { upsert: true, new: true },
   );
+
+  // Invalidate sessions cache — new session data written
+  await invalidateCache(`sessions:${userId}:*`);
 
   return session;
 };
 
-/**
- * Retrieves all sessions for a user within a time range.
- * Called by the insights service and the dashboard.
- *
- * @param {string} userId
- * @param {Date} from
- * @param {Date} to
- * @returns {Promise<Array>} Array of session documents, newest first
- */
 const getSessionsByUserAndRange = async (userId, from, to) => {
+  const cacheKey = `sessions:${userId}:${from.toISOString()}:${to.toISOString()}`;
+
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log(`[cache] ✅ HIT — ${cacheKey}`);
+    return cached;
+  }
+
   const sessions = await Session.find({
     userId,
     startTime: { $gte: from, $lte: to },
-  }).sort({ startTime: -1 }); // Newest first — dashboard shows recent sessions first
+  }).sort({ startTime: -1 });
+
+  await setCache(cacheKey, sessions, TTL.SESSIONS);
+  console.log(`[cache] 💾 SET — ${cacheKey}`);
 
   return sessions;
 };
 
-/**
- * Retrieves a single session by sessionId.
- * @param {string} sessionId
- * @returns {Promise<Object|null>}
- */
 const getSessionById = async (sessionId) => {
   const session = await Session.findOne({ sessionId });
   return session;
@@ -162,5 +116,5 @@ export {
   buildSession,
   getSessionsByUserAndRange,
   getSessionById,
-  analyzeFocusPatterns, // Exported for use in scoring.service.js
+  analyzeFocusPatterns,
 };
