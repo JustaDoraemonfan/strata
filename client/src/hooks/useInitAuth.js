@@ -15,11 +15,13 @@ export const useInitAuth = () => {
         );
 
         const { data: meData } = await axios.get("/api/auth/me", {
-          headers: { Authorization: `Bearer ${refreshData.accessToken}` },
+          headers: { Authorization: `Bearer ${refreshData.data.accessToken}` },
           withCredentials: true,
         });
 
-        useAuthStore.getState().setAuth(refreshData.accessToken, meData.user);
+        useAuthStore
+          .getState()
+          .setAuth(refreshData.data.accessToken, meData.data.user);
       } catch {
         // no valid cookie — not logged in, stay on login page
       } finally {

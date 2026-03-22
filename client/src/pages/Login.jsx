@@ -19,10 +19,10 @@ export default function Login() {
 
     try {
       const { data } = await login(email, password);
-      setAuth(data.accessToken, data.user);
+      setAuth(data.data.accessToken, data.data.user); // ← data.data
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "something went wrong");
+      setError(err.response?.data?.error || "something went wrong");
     } finally {
       setLoading(false);
     }

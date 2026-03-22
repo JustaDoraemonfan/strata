@@ -20,7 +20,7 @@ export default function Register() {
 
     try {
       const { data } = await register(displayName, email, password);
-      setAuth(data.accessToken, data.user);
+      setAuth(data.data.accessToken, data.data.user);
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "something went wrong");
