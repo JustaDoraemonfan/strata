@@ -3,6 +3,7 @@ import { useInitAuth } from "./hooks/useInitAuth";
 import { useAuthStore } from "./store/authStore";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 function ProtectedRoute({ children }) {
   const user = useAuthStore((s) => s.user);
@@ -62,9 +63,7 @@ export default function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <div style={{ color: "white", padding: 20 }}>
-                dashboard placeholder
-              </div>
+              <Dashboard />
             </ProtectedRoute>
           }
         />
