@@ -29,8 +29,8 @@ export const useDashboard = () => {
           getWeekInsight(monday.toISOString()),
         ]);
 
-        setSessions(sessionsRes.data.data.sessions || []);
-        setInsight(insightRes.data.data.insight || null);
+        setSessions(sessionsRes.data.data || []);
+        setInsight(insightRes.data.data || null);
       } catch (err) {
         setError(err.message);
       } finally {
