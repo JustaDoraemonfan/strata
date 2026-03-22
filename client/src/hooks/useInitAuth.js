@@ -1,19 +1,27 @@
 import { useEffect, useState } from "react";
-import { refresh, getMe } from "../api/auth";
+import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 
 export const useInitAuth = () => {
   const [ready, setReady] = useState(false);
-  const setAuth = useAuthStore((s) => s.setAuth);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const { data: refreshData } = await refresh();
-        const { data: meData } = await getMe();
-        setAuth(refreshData.accessToken, meData.user);
+        const { data: refreshData } = await axios.post(
+          "/api/auth/refresh",
+          {},
+          { withCredentials: true },
+        );
+
+        const { data: meData } = await axios.get("/api/auth/me", {
+          headers: { Authorization: `Bearer ${refreshData.accessToken}` },
+          withCredentials: true,
+        });
+
+        useAuthStore.getState().setAuth(refreshData.accessToken, meData.user);
       } catch {
-        // no valid cookie — user needs to log in, that's fine
+        // no valid cookie — not logged in, stay on login page
       } finally {
         setReady(true);
       }
