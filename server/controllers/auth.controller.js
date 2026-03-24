@@ -1,7 +1,7 @@
 import {
   registerUser,
   loginUser,
-  rotateRefreshToken,
+  rotateRefreshToke
   logoutUser,
 } from "../services/auth.service.js";
 
