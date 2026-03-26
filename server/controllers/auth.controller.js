@@ -3,7 +3,7 @@ import {
   loginUser,
   rotateRefreshToken,
   logoutUser,
-} from "../services/auth.service.js";
+} from "../services/.service.js";
 
 // Cookie configuration — same settings used for set and clear
 const COOKIE_OPTIONS = {
