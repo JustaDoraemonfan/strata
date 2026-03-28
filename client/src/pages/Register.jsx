@@ -117,7 +117,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: "'Google Sans Code', monospace",
     padding: "20px",
   },
   card: {
@@ -180,7 +180,7 @@ const styles = {
     padding: "10px 12px",
     fontSize: "13px",
     color: "rgba(255,255,255,0.75)",
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: "'Google Sans Code', monospace",
     outline: "none",
   },
   error: {
@@ -209,7 +209,7 @@ const styles = {
     padding: "11px",
     fontSize: "13px",
     color: "#a09af0",
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: "'Google Sans Code', monospace",
     fontWeight: "500",
     letterSpacing: "0.04em",
     marginTop: "4px",

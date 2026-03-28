@@ -39,7 +39,7 @@ api.interceptors.response.use(
         return api(original);
       } catch {
         _getStore?.().clearAuth();
-        // window.location.href = "/login";
+        window.location.href = "/login";
       }
     }
 

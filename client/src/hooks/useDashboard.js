@@ -9,7 +9,7 @@ export const useDashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const load = async () => {
       try {
         setLoading(true);
 
@@ -24,13 +24,25 @@ export const useDashboard = () => {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const [sessionsRes, insightRes] = await Promise.all([
-          getSessions(thirtyDaysAgo.toISOString(), now.toISOString()),
-          getWeekInsight(monday.toISOString()),
-        ]);
-
+        // Fetch sessions — this is a hard failure if it fails
+        const sessionsRes = await getSessions(
+          thirtyDaysAgo.toISOString(),
+          now.toISOString(),
+        );
         setSessions(sessionsRes.data.data || []);
-        setInsight(insightRes.data.data || null);
+
+        // Fetch insight — 404 means no insight built yet for this week, not an error
+        try {
+          const insightRes = await getWeekInsight(monday.toISOString());
+          setInsight(insightRes.data.data || null);
+        } catch (insightErr) {
+          // 404 = no insight for this week yet — treat as empty, not a failure
+          if (insightErr.response?.status === 404) {
+            setInsight(null);
+          } else {
+            throw insightErr; // re-throw real errors
+          }
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -38,7 +50,7 @@ export const useDashboard = () => {
       }
     };
 
-    fetch();
+    load();
   }, []);
 
   return { sessions, insight, loading, error };

@@ -2,7 +2,16 @@
 import { useDashboard } from "../hooks/useDashboard";
 import Topbar from "../components/layout/Topbar";
 
-const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+const DAY_LABELS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
 function scoreColor(score) {
   if (score >= 75) return "#5DCAA5";
@@ -202,7 +211,7 @@ export default function Dashboard() {
             >
               <div style={s.sectionLabel}>this week</div>
               <div style={s.weekGrid}>
-                {DAYS.map((day) => {
+                {DAYS.map((day, i) => {
                   const score = weekScores[day] ?? 0;
                   const height = score
                     ? Math.max(8, (score / maxBarScore) * 52)
@@ -222,7 +231,7 @@ export default function Dashboard() {
                           }}
                         />
                       </div>
-                      <div style={s.dayLabel}>{day}</div>
+                      <div style={s.dayLabel}>{DAY_LABELS[i]}</div>
                       <div style={s.dayVal}>{score || "—"}</div>
                     </div>
                   );
@@ -500,7 +509,7 @@ const s = {
   page: {
     minHeight: "100vh",
     background: "#0e0e10",
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: "'Google Sans Code', monospace",
   },
   loading: {
     display: "flex",

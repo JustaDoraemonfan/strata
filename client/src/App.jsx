@@ -31,7 +31,7 @@ export default function App() {
           color: "rgba(255,255,255,0.15)",
           fontSize: "11px",
           letterSpacing: "0.12em",
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: "'Google Sans Code', monospace",
           background: "#0e0e10",
         }}
       >
