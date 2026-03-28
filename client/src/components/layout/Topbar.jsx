@@ -205,7 +205,7 @@ const s = {
   },
   logoutBtn: {
     fontSize: 10,
-    color: "rgba(255,255,255,0.22)",
+    color: "rgba(255,255,255)",
     background: "none",
     border: "0.5px solid rgba(255,255,255,0.1)",
     cursor: "pointer",

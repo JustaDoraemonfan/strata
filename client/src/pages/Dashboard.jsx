@@ -536,7 +536,7 @@ const s = {
   sectionLabel: {
     fontSize: 9,
     letterSpacing: "0.14em",
-    color: "rgba(255,255,255,0.25)",
+    color: "rgba(255,255,255)",
     textTransform: "uppercase",
     marginBottom: 10,
   },
@@ -550,7 +550,7 @@ const s = {
   },
   scoreMeta: {
     fontSize: 10,
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(255,255,255, 0.7)",
     marginTop: 8,
     lineHeight: 1.6,
   },
@@ -563,7 +563,7 @@ const s = {
     justifyContent: "space-between",
     alignItems: "center",
   },
-  insetLabel: { fontSize: 10, color: "rgba(255,255,255,0.25)" },
+  insetLabel: { fontSize: 10, color: "rgba(255,255,255,0.5)" },
   weekGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(7, 1fr)",
@@ -577,7 +577,7 @@ const s = {
     gap: 3,
   },
   dayBarWrap: { height: 52, display: "flex", alignItems: "flex-end" },
-  dayLabel: { fontSize: 8, color: "rgba(255,255,255,0.2)" },
+  dayLabel: { fontSize: 8, color: "rgba(255,255,255,0.5)" },
   dayVal: { fontSize: 9, color: "rgba(255,255,255,0.4)" },
   statRow: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 },
   statCard: {
@@ -588,7 +588,7 @@ const s = {
   },
   statLabel: {
     fontSize: 9,
-    color: "rgba(255,255,255,0.25)",
+    color: "rgba(255,255,255)",
     letterSpacing: "0.1em",
     textTransform: "uppercase",
     marginBottom: 5,
@@ -604,7 +604,7 @@ const s = {
   panelTitle: {
     fontSize: 10,
     letterSpacing: "0.12em",
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(255,255,255)",
     textTransform: "uppercase",
   },
   panelLink: {
