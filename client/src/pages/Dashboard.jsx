@@ -1,6 +1,5 @@
 //import { useAuthStore } from "../store/authStore";
 import { useDashboard } from "../hooks/useDashboard";
-import Topbar from "../components/layout/Topbar";
 
 const DAYS = [
   "monday",
@@ -97,8 +96,6 @@ export default function Dashboard() {
 
   return (
     <div style={s.page}>
-      <Topbar />
-
       {loading ? (
         <div style={s.loading}>fetching your data...</div>
       ) : (

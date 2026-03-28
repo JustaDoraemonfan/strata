@@ -1,9 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useInitAuth } from "./hooks/useInitAuth";
 import { useAuthStore } from "./store/authStore";
+
+import AppShell from "./components/layout/AppShell";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Sessions from "./pages/Sessions";
+import Insights from "./pages/Insights";
+import Settings from "./pages/Settings";
 
 function ProtectedRoute({ children }) {
   const user = useAuthStore((s) => s.user);
@@ -43,6 +48,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Guest routes — no shell */}
         <Route
           path="/login"
           element={
@@ -59,14 +65,21 @@ export default function App() {
             </GuestRoute>
           }
         />
+
+        {/* Protected routes — rendered inside AppShell (sidebar layout) */}
         <Route
-          path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <AppShell />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/sessions" element={<Sessions />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
