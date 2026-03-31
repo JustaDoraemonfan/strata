@@ -3,6 +3,7 @@ import {
   loginUser,
   rotateRefreshToken,
   logoutUser,
+  updateUser,
 } from "../services/auth.service.js";
 
 // Cookie configuration — same settings used for set and clear
@@ -194,4 +195,60 @@ const getMe = async (req, res) => {
   });
 };
 
-export { register, login, refresh, logout, getMe };
+/**
+ * PATCH /api/auth/me
+ * Updates the current user's profile and preferences.
+ * Only whitelisted fields are accepted — nothing else can be changed here.
+ */
+const updateMe = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { displayName, timezone, preferences } = req.body;
+
+    // Build update object from only the fields that were actually sent
+    const updates = {};
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (timezone !== undefined) updates.timezone = timezone;
+    if (preferences !== undefined) {
+      if (preferences.interruptionThresholdMinutes !== undefined) {
+        updates["preferences.interruptionThresholdMinutes"] =
+          preferences.interruptionThresholdMinutes;
+      }
+      if (preferences.weeklyReportEnabled !== undefined) {
+        updates["preferences.weeklyReportEnabled"] =
+          preferences.weeklyReportEnabled;
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "No valid fields provided to update",
+      });
+    }
+
+    const updatedUser = await updateUser(userId, updates);
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        error: "Validation failed",
+        details: Object.values(error.errors).map((e) => e.message),
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: "Failed to update profile",
+      ...(process.env.NODE_ENV === "development" && { debug: error.message }),
+    });
+  }
+};
+
+export { register, login, refresh, logout, getMe, updateMe };

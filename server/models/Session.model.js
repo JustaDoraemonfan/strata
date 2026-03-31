@@ -54,6 +54,17 @@ const sessionSchema = new mongoose.Schema(
       max: [100, "Stratum score cannot exceed 100"],
     },
 
+    // Individual component scores — persisted alongside stratumScore so the
+    // frontend can render the breakdown bars without recomputing anything.
+    // All null until scoring.service runs.
+    componentScores: {
+      commitCadence: { type: Number, default: null },
+      errorRate: { type: Number, default: null },
+      editVelocity: { type: Number, default: null },
+      focusDepth: { type: Number, default: null },
+      sessionDuration: { type: Number, default: null },
+    },
+
     focusBlocks: {
       type: [focusBlockSchema],
       default: [], // Array of uninterrupted coding blocks

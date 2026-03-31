@@ -127,12 +127,14 @@ const computeStratumScore = async (sessionId) => {
   // Clamp to 0–100 just in case of any floating point edge cases
   const stratumScore = Math.min(100, Math.max(0, total));
 
-  // Persist the score back to the session document
+  // Persist the score and full component breakdown back to the session document.
+  // componentScores is what the frontend uses to render the breakdown bars.
   await Session.findOneAndUpdate(
     { sessionId },
     {
       stratumScore,
-      scored: true, // Mark as scored — won't be reprocessed unless rebuilt
+      componentScores: breakdown, // ← persist the full breakdown, not just total
+      scored: true,
     },
   );
 

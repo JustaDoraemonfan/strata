@@ -1,0 +1,66 @@
+{
+  "name": "strata-dev",
+  "displayName": "Strata",
+  "description": "Developer behavior analytics — tracks your coding sessions and computes your Stratum Score.",
+  "version": "0.1.0",
+  "publisher": "strata",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Strata",
+      "properties": {
+        "strata.accessToken": {
+          "type": "string",
+          "default": "",
+          "description": "Your Strata access token. Get this by logging in at your Strata dashboard.",
+          "markdownDescription": "Your Strata access token. Paste it here after logging into your Strata dashboard."
+        },
+        "strata.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:5000",
+          "description": "Strata API base URL. Change this if you're using a hosted instance."
+        },
+        "strata.idleTimeoutMinutes": {
+          "type": "number",
+          "default": 30,
+          "minimum": 5,
+          "maximum": 120,
+          "description": "Minutes of inactivity before a new session is started."
+        },
+        "strata.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable Strata tracking."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "strata.showStatus",
+        "title": "Strata: Show Status"
+      },
+      {
+        "command": "strata.newSession",
+        "title": "Strata: Start New Session"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

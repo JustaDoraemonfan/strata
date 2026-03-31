@@ -151,44 +151,34 @@ export default function Dashboard() {
                     {[
                       [
                         "commit cadence",
-                        latestSession.stratumScore
-                          ? Math.round(latestSession.stratumScore * 0.25)
-                          : "—",
+                        latestSession.componentScores?.commitCadence,
                         25,
-                      ],
-                      [
-                        "focus depth",
-                        latestSession.stratumScore
-                          ? Math.round(latestSession.stratumScore * 0.2)
-                          : "—",
-                        20,
-                      ],
-                      [
-                        "edit velocity",
-                        latestSession.stratumScore
-                          ? Math.round(latestSession.stratumScore * 0.2)
-                          : "—",
-                        20,
                       ],
                       [
                         "error rate",
-                        latestSession.stratumScore
-                          ? Math.round(latestSession.stratumScore * 0.25)
-                          : "—",
+                        latestSession.componentScores?.errorRate,
                         25,
                       ],
                       [
+                        "edit velocity",
+                        latestSession.componentScores?.editVelocity,
+                        20,
+                      ],
+                      [
+                        "focus depth",
+                        latestSession.componentScores?.focusDepth,
+                        20,
+                      ],
+                      [
                         "session duration",
-                        latestSession.stratumScore
-                          ? Math.round(latestSession.stratumScore * 0.1)
-                          : "—",
+                        latestSession.componentScores?.sessionDuration,
                         10,
                       ],
                     ].map(([label, val, max]) => (
                       <div key={label} style={s.inset}>
                         <span style={s.insetLabel}>{label}</span>
                         <span style={{ fontSize: 10, color: "#a09af0" }}>
-                          {val} / {max}
+                          {val ?? "—"} / {max}
                         </span>
                       </div>
                     ))}

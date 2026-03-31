@@ -183,11 +183,43 @@ const logoutUser = async (userId) => {
   await User.findByIdAndUpdate(userId, { refreshToken: null });
 };
 
+/**
+ * Updates a user's profile fields.
+ * Uses dot-notation keys for nested preferences so MongoDB merges correctly
+ * instead of replacing the entire preferences object.
+ * @param {string} userId
+ * @param {Object} updates - Dot-notation safe update object from controller
+ * @returns {Promise<Object>} Clean user object (no password, no refreshToken)
+ */
+const updateUser = async (userId, updates) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $set: updates },
+    {
+      new: true, // Return the updated document, not the old one
+      runValidators: true, // Run schema validators on the updated fields
+    },
+  );
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  return {
+    userId: user._id.toString(),
+    email: user.email,
+    displayName: user.displayName,
+    timezone: user.timezone,
+    preferences: user.preferences,
+  };
+};
+
 export {
   registerUser,
   loginUser,
   rotateRefreshToken,
   logoutUser,
+  updateUser,
   generateAccessToken,
   generateRefreshToken,
 };
