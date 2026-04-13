@@ -17,7 +17,7 @@ const registerDebugTracker = (sessionManager) => {
       type: "debug",
       sessionId: sessionManager.sessionId,
       projectId: sessionManager.projectId,
-      timestamp: new ().toISOString(),
+      timestamp: new Date().toISOString(),
       metadata: {
         debugType: session.type, // e.g. "node", "python", "chrome"
         debugName: session.name, // The launch config name
