@@ -38,7 +38,7 @@ const registerErrorTracker = (sessionManager) => {
           errorCount: errors.length,
           // Send first error message for context — capped for safety
           firstError: errors[0].message.slice(0, 200),
-          source: errors[0].source ?? "unknown",
+          source: errors[0]. ?? "unknown",
         },
       });
 
