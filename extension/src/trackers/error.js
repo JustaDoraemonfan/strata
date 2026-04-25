@@ -37,7 +37,7 @@ const registerErrorTracker = (sessionManager) => {
           file: vscode.workspace.asRelativePath(uri),
           errorCount: errors.length,
           // Send first error message for context — capped for safety
-          firstError: errors[0].message.slice(, 200),
+          firstError: errors[0].message.slice(0, 200),
           source: errors[0].source ?? "unknown",
         },
       });
