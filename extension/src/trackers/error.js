@@ -42,7 +42,7 @@ const registerErrorTracker = (sessionManager) => {
         },
       });
 
-      //  fire one event per diagnostic change, not one per error per file.
+      // Only fire one event per diagnostic change, not one per error per file.
       // The errorCount in metadata is what the scoring service uses.
       break;
     }
