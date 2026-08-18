@@ -46,7 +46,7 @@ const registerErrorTracker = (sessionManager) => {
       // The errorCount in metadata is what the scoring service uses.
       break;
     }
-  });vaa
+  });
 };
 
 module.exports = registerErrorTracker;
