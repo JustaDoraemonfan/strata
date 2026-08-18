@@ -47,7 +47,6 @@ const registerErrorTracker = (sessionManager) => {
       break;
     }
   });
-  vaa;
 };
 
 module.exports = registerErrorTracker;
