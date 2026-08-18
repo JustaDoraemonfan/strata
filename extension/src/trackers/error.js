@@ -47,7 +47,6 @@ const registerErrorTracker = (sessionManager) => {
       break;
     }
   });
-  dbd;
 };
 
 module.exports = registerErrorTracker;
